@@ -19,10 +19,29 @@ body {
 /* Navigation styles */
 .navbar {
     background-color: white;
-    padding: 1.25rem;
+    padding: 1rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     position: sticky;
     top: 0;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
 }
 
 .navbar ul {
@@ -30,7 +49,6 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: center;
     gap: 3rem;
 }
 
@@ -178,6 +196,67 @@ p {
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: center;
     gap: 3rem;
+}
+
+/* Privacy page styles */
+.privacy-content section {
+    margin-bottom: 2.5rem;
+}
+
+.privacy-content h2 {
+    font-size: 1.5rem;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+.privacy-content ul {
+    margin-left: 1rem;
+}
+
+.privacy-content a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.privacy-content a:hover {
+    text-decoration: underline;
+}
+
+/* About page styles */
+.about-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.about-section {
+    margin-bottom: 3rem;
+}
+
+.about-section h2 {
+    font-size: 1.75rem;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+}
+
+.about-content a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.about-content a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {        
+    .nav-container {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .navbar ul {
+        gap: 1.5rem;
+    }
 }
