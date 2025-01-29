@@ -260,3 +260,28 @@ p {
         gap: 1.5rem;
     }
 }
+
+footer {
+    background-color: #f8f9fa;
+    padding: 1.5rem 0;
+    text-align: center;
+    margin-top: 2rem;
+    border-top: 1px solid #dee2e6;
+    width: 100%;
+}
+
+footer p {
+    margin: 0.5rem 0;
+    color: #6c757d;
+}
+
+footer a {
+    color: #0056b3;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+footer a:hover {
+    color: #003d7a;
+    text-decoration: underline;
+}
