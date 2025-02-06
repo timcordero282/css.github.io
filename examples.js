@@ -1,4 +1,4 @@
-async function loadData() {
+async function loadSalesData() {
     try {
         const response = await fetch('./sales_data_sample.csv');
         const data = await response.text();
@@ -7,6 +7,7 @@ async function loadData() {
         // Process data for charts
         const monthlySales = {};
         const prodcutSales = {};
+        const orderStatus = {};
         
         rows.forEach(row => {
             const columns = row.split(',');
@@ -15,16 +16,20 @@ async function loadData() {
                 const qty = parseInt(columns[1]);
                 const date = new Date(columns[5]);
                 const monthYear = `${date.getFullYear()}-${date.getMonth() + 1}`;
+                const product = columns[10];
+                const status = columns[6];  
+                const orderNum = columns[0];
 
                 // Aggregate sales by month
                 monthlySales[monthYear] = (monthlySales[monthYear] || 0) + (sales * qty);
 
-                // Aggregate order status
-                const product = columns[10];
+                // Aggregate order status                
                 prodcutSales[product] = (prodcutSales[product] || 0) + (sales * qty);
+                
+                orderStatus[status] = (orderStatus[status] || 0) + 1;
             }
         });
-
+        
         // Create Monthly Sales Chart
         const monthlyLabels = Object.keys(monthlySales)
             .sort((a, b) => {
@@ -58,8 +63,12 @@ async function loadData() {
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: true,
                     plugins: {
                         title: {
+                            display: false
+                        },
+                        legend: {
                             display: false
                         }
                     },
@@ -86,7 +95,7 @@ async function loadData() {
 
         // Create Product Sales Bar Chart
         const productLabels = Object.keys(sortedProducts);
-        const productData = Object.values(sortedProducts);
+        const productData = Object.values(sortedProducts);        
         const colors = [
             'rgb(37, 99, 235)',   // blue
             'rgb(239, 68, 68)',   // red
@@ -102,24 +111,29 @@ async function loadData() {
             {
                 type: 'bar',
                 data: {
-                    labels: ['Sales by Product'],
-                    datasets: productLabels.map((product, index) => ({
-                        label: product,
-                        data: [productData[index]],
-                        backgroundColor: colors[index % colors.length]
-                    }))
-                },
+                    labels: productLabels,
+                    datasets: [{                        
+                        data: productData,
+                        backgroundColor: [
+                            'rgb(37, 99, 235)',   // blue
+                            'rgb(239, 68, 68)',   // red
+                            'rgb(34, 197, 94)',   // green
+                            'rgb(234, 179, 8)',   // yellow
+                            'rgb(168, 85, 247)',  // purple
+                            'rgb(236, 72, 153)',  // pink
+                            'rgb(128, 128, 128)'  // gray
+                        ]
+                    }]
+                },                
                 options: {
                     responsive: true,
-
+                    maintainAspectRatio: true,
                     plugins: {
                         title: {
                             display: true
                         },
                         legend: {
-                            display: true,
-                            position: 'top',
-                            align: 'center'
+                            display: false
                         }
                     },
                     scales: {
@@ -130,10 +144,33 @@ async function loadData() {
                                     return '$' + value.toLocaleString();
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        );
+
+        new Chart( 
+            document.getElementById('orderStatusPie'),
+            {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(orderStatus),
+                    datasets: [{
+                        data: Object.values(orderStatus),                     
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
                         },
-                        x:{
-                            ticks:{
-                                display:false
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return tooltipItem.label + ': ' + tooltipItem.raw;
+                                }
                             }
                         }
                     }
@@ -144,8 +181,56 @@ async function loadData() {
         console.error('Error loading or processing data:', error);
     }
 }
+var rows = [];
+async function loadNhlData() {
+    try {
+        const response = await fetch('./nhl.csv');
+        const data = await response.text();
+        rows = data.split('\n').slice(1); // Skip header row
+       
+        const table = new DataTable('#nhlTable');        
+        $( "#dialog" ).dialog({
+            autoOpen: false,
+        });
+        
+
+        rows.forEach(row => {
+            const columns = row.split(',');
+            if (columns.length > 2) {                
+                table.row
+                .add([
+                    columns[0],
+                    columns[1],
+                    columns[4],
+                    columns[6],
+                    columns[7],
+                    columns[8],
+                    "<td>" + '<button style="float:right" onclick="onClickView('+ columns[0] + ')">View</button>' + "</td>"
+                ])
+                .draw(false);                                
+            }
+        });
+    }    
+    catch (error) {
+        console.error('Error loading or processing data:', error);
+    }
+}
+
+function onClickView(id) {        
+    var player = rows.find(function(e) {  
+        e = e.split(',');        
+        return e[0] == id
+    });
+    player = player.split(',');
+    let playerDialog = document.getElementById("dialog"); 
+    playerDialog.innerHTML = "Name: " + player[1] + "<br>Age: " + player[2] + "<br>Team: " + player[3] + "<br>Position: " + player[4];
+    $("#dialog").dialog("open");
+}
+
 
 function openTab(evt, tabName) {
+    evt.preventDefault();
+    
     // Hide all tab content
     const tabContents = document.getElementsByClassName("tab-content");
     for (let content of tabContents) {
@@ -163,5 +248,6 @@ function openTab(evt, tabName) {
     evt.currentTarget.classList.add("active");
 }
 
-// Initialize the dashboard when the page loads
-document.addEventListener('DOMContentLoaded', loadData); 
+// Initialize dashboard and nhl when the page loads
+document.addEventListener('DOMContentLoaded', loadSalesData); 
+document.addEventListener('DOMContentLoaded', loadNhlData); 
