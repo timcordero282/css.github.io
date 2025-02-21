@@ -250,7 +250,7 @@ p {
     text-decoration: underline;
 }
 
-.about-section img {
+.about-section .profileImg {
     width: 200px;
     height: 200px;
     border-radius: 50%;
